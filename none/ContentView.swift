@@ -9,33 +9,47 @@ import Combine
 import SwiftUI
 
 struct ContentView: View {
+
+    init() {
+        let appearance = UITabBarAppearance()
+        appearance.configureWithOpaqueBackground()
+        appearance.backgroundColor = UIColor(Color("SecondaryBg"))
+
+        UITabBar.appearance().standardAppearance = appearance
+        if #available(iOS 15.0, *) {
+            UITabBar.appearance().scrollEdgeAppearance = appearance
+        }
+    }
+
     var body: some View {
         TabView {
             Text("People")
                 .tabItem {
-                    Label("People", systemImage: "person.2.fill")
+                    Image(systemName: "person.2.fill")
                 }
             
             ChatView()
                 .tabItem {
-                    Label("Chat", systemImage: "message.fill")
+                    Image(systemName: "message.fill")
                 }
             
-            LogsView()
+            HistoryView(workouts: HistoryViewModel(workouts: [testingWorkout, testingWorkout, testingWorkout1, testingWorkout1, testingWorkout]))
+                .background(Color("PrimaryBg"))
                 .tabItem {
-                    Label("Log", systemImage: "doc.text.fill")
+                    Image(systemName: "doc.text.fill")
                 }
 
             Text("Templates View")
                 .tabItem {
-                    Label("Templates", systemImage: "square.grid.2x2.fill")
+                    Image(systemName: "square.grid.2x2.fill")
                 }
             
             Text("Profile View")
                 .tabItem {
-                    Label("Profile", systemImage: "person.crop.circle")
+                    Image(systemName: "person.crop.circle")
                 }
         }
+        .accentColor(Color("PrimaryColor"))
     }
 }
 
