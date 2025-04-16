@@ -11,6 +11,7 @@ struct ExerciseSearch: View {
     @State var isPicked: Bool = false
     @State private var searchTerm: String = ""
     @State var exercises: [ExerciseInfo] = []
+//    @State private var selection = Set<ExerciseInfo>()
     @StateObject var exercisevm: ExerciseInfoViewModel = ExerciseInfoViewModel()
 
     @State var isLoading: Bool = false
@@ -74,8 +75,12 @@ struct ExerciseSearch: View {
                 Spacer()
 
                 // MARK: Search Bar
-                TextField("Search bar", text: $searchTerm) {
-                    print("NIGGER")
+                HStack {
+                    Image(systemName: "magnifyingglass")
+                        .foregroundStyle(.secondaryLabel)
+                    TextField("Search bar", text: $searchTerm) {
+                        print("NIGGER")
+                    }
                 }
                 .padding()
                 .lineLimit(1)
@@ -87,12 +92,18 @@ struct ExerciseSearch: View {
                 .padding(.horizontal)
 
                 // MARK: Exercise List
-                List {
-                    ForEach(Array(exercisevm.groupedExercises.keys), id: \.self) { key in
-                        Section(header: Text(key)) {
-                            ForEach(exercisevm.groupedExercises[key]!/*, id: \.id*/) { e in
-                                ExerciseRow(exercise: e, selected: Int.random(in: 0...1) == 0)
+                List/*(selection: $selection)*/ {
+                    if searchTerm.isEmpty {
+                        ForEach(Array(exercisevm.groupedExercises.keys), id: \.self) { key in
+                            Section(header: Text(key)) {
+                                ForEach(exercisevm.groupedExercises[key]!/*, id: \.id*/) { e in
+                                    ExerciseRow(exercise: e, selected: Int.random(in: 0...1) == 0)
+                                }
                             }
+                        }
+                    } else {
+                        ForEach(filteredExercises, id: \.id) { e in
+                            ExerciseRow(exercise: e, selected: Int.random(in: 0...1) == 0)
                         }
                     }
                 }
