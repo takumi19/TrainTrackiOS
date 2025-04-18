@@ -113,12 +113,12 @@ struct WorkoutCardView: View {
             .padding()
             .background(Color("SecondaryBg"))
             .cornerRadius(10)
-//            .onTapGesture {
-//                showDetails.toggle()
-//            }
-//            if showDetails {
-//                WorkoutDetailsView(workout: workout)
-//            }
+            //            .onTapGesture {
+            //                showDetails.toggle()
+            //            }
+            //            if showDetails {
+            //                WorkoutDetailsView(workout: workout)
+            //            }
         }
     }
 }
@@ -127,54 +127,71 @@ struct WorkoutCardView: View {
 
 // MARK: Main Training Logs Page
 struct HistoryView : View {
-    @ObservedObject var workouts: HistoryViewModel
+    @ObservedObject var workouts: HistoryViewModel = HistoryViewModel()
     private var prevMonth: Int?
     @State private var chosenWorkout: Workout?
-    @State private var showDetails: Bool
+    @State private var showDetails: Bool = false
+    @State private var showEditing: Bool = false
 
     init(workouts: HistoryViewModel) {
         self.workouts = workouts
-        showDetails = false
+        UINavigationBar.appearance().largeTitleTextAttributes = [.font : UIFont.systemFont(ofSize: 32, weight: .bold, width: .condensed)]
     }
 
     var body : some View {
-        ZStack {
-            ScrollView {
-                HStack {
-                    Text("History")
-                        .font(.largeTitle)
-                        .fontWidth(.condensed)
-                        .fontWeight(.bold)
-                    Spacer()
-                }
+//        NavigationStack {
+            ZStack {
+                ScrollView {
+                    HStack {
+                        Text("History")
+                            .font(.largeTitle)
+                            .fontWidth(.condensed)
+                            .fontWeight(.bold)
+                        Spacer()
+                    }
 
-                // TODO: Don't call this shitty method twice
-                ForEach(workouts.groupedWorkouts(), id: \.month) { section in
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text(section.month)
-                            .font(.subheadline)
-                            .foregroundColor(.gray)
-                            .fontWeight(.semibold)
-                            .padding(.bottom, 8)
+                    // TODO: Don't call this shitty method twice
+                    ForEach(workouts.groupedWorkouts(), id: \.month) { section in
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text(section.month)
+                                .font(.subheadline)
+                                .foregroundColor(.gray)
+                                .fontWeight(.semibold)
+                                .padding(.bottom, 8)
 
-                        ForEach(section.workouts) { workout in
-                            WorkoutCardView(workout: workout)
-                                .padding(.bottom, 16)
-                                .onTapGesture {
-                                    showDetails.toggle()
-                                    chosenWorkout = workout
-                                }
+                            ForEach(section.workouts) { workout in
+//                                NavigationLink(value: workout) {
+                                    WorkoutCardView(workout: workout)
+                                        .padding(.bottom, 16)
+                                        .onTapGesture {
+                                            showDetails.toggle()
+                                            chosenWorkout = workout
+                                        }
+//                                }
+//                                .buttonStyle(.plain)
+                            }
                         }
                     }
+                    .padding(.top, 24)
                 }
-                .padding(.top, 24)
+                .scrollIndicators(.hidden)
+                .padding(.horizontal, 16)
+                if showDetails {
+                    WorkoutDetailsView(isPresented: $showDetails, workout: chosenWorkout!, showEditing: $showEditing)
+                }
+
+                if showEditing {
+                    EditWorkoutView(workout: chosenWorkout!, isPresented: $showEditing)
+//                        .animation(.easeIn(duration: 0.3), value: showEditing)
+                }
             }
-            //            .navigationTitle("History")
-            .padding(.horizontal, 16)
-            if showDetails {
-                WorkoutDetailsView(isPresented: $showDetails, workout: chosenWorkout!)
-            }
-        }
+            .background(Color("PrimaryBg"))
+//            .navigationTitle("History")
+//            .navigationBarTitleDisplayMode(.large)
+//            .navigationDestination(for: Workout.self) { workout in
+//                WorkoutDetailsView(isPresented: $showDetails, workout: workout)
+//            }
+//        }
     }
 }
 
@@ -396,5 +413,5 @@ let testingWorkout1 = Workout(
 
 #Preview {
     HistoryView(workouts: HistoryViewModel(workouts: [testingWorkout, testingWorkout, testingWorkout1, testingWorkout1, testingWorkout]))
-        .background(Color("PrimaryBg"))
+//        .background(Color("PrimaryBg"))
 }

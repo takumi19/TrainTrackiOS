@@ -9,15 +9,15 @@ import SwiftUI
 
 @main
 struct noneApp: App {
-//    @StateObject var userManager: UserManager = UserManager()
-    
-    // TODO: Optionally load some data from last saved session
-    
+    @AppStorage("logged_in") var logged_in: Bool = true
     var body: some Scene {
         WindowGroup {
-            ContentView()
-                .preferredColorScheme(.dark)
-//                .environmentObject(userManager)
+            if logged_in {
+                ContentView()
+                    .preferredColorScheme(.dark)
+            } else {
+                LoginView()
+            }
         }
     }
 }

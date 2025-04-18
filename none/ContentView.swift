@@ -27,12 +27,12 @@ struct ContentView: View {
                 .tabItem {
                     Image(systemName: "person.2.fill")
                 }
-            
+
             ChatView()
                 .tabItem {
                     Image(systemName: "message.fill")
                 }
-            
+
             HistoryView(workouts: HistoryViewModel(workouts: [testingWorkout, testingWorkout, testingWorkout1, testingWorkout1, testingWorkout]))
                 .background(Color("PrimaryBg"))
                 .tabItem {
@@ -43,7 +43,7 @@ struct ContentView: View {
                 .tabItem {
                     Image(systemName: "square.grid.2x2.fill")
                 }
-            
+
             Text("Profile View")
                 .tabItem {
                     Image(systemName: "person.crop.circle")

@@ -7,210 +7,200 @@
 import SwiftUI
 
 struct EditWorkoutView: View {
-    //    @Binding var isPresented: Bool
     var workout: Workout
+    @Binding var isPresented: Bool
+    @State var showSearchExercises: Bool = false
     @State var str: String = "1"
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-
-            // MARK: Top Bar
-            HStack {
-                Button(action: {
-                    //  isPresented = false
-                    print("Pressed")
-                }) {
-                    Image(systemName: "xmark.square.fill")
-                        .symbolRenderingMode(.palette)
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .foregroundStyle(Color("PrimaryColor"), Color.black.opacity(0.3))
-//                        .foregroundColor(Color("PrimaryColor"))
-//                        .font(.title2)
-                }
-                .frame(width: 35, height: 35) // Define frame size
-//                .padding(6)
-//                .background(.black.opacity(0.4))
-//                .clipShape(.buttonBorder)
-                Spacer()
-                Text("Edit Workout")
-                    .font(.title2)
-                    .fontWeight(.bold)
-                    .foregroundColor(.white)
-                Spacer()
-                Button("Save") {
-                    print("Hi")
-                }
-                .padding(8)
-                .background(.black.opacity(0.4))
-                .clipShape(.buttonBorder)
-                .foregroundStyle(Color("PrimaryColor"))
-                .fontWeight(.semibold)
-            }
-
-            // MARK: Header - Name, Notes, Date
+        ZStack {
             VStack(alignment: .leading, spacing: 12) {
-                HStack {
-                    Text(workout.name)
-                        .font(.title)
-                        .fontWeight(.bold)
-                    Spacer()
-                    Button(action: {
-                        print("Editing the name of the workout")
-                    }) {
-                        Image(systemName: "pencil")
-                            .foregroundStyle(.white)
-                        //                        .frame(minWidth: 24, minHeight: 24)
-                        //                        .scaledToFill()
-                    }
-                }
-                Text(workout.date.formatted(
-                    .dateTime
-                        .hour(.defaultDigits(amPM: .omitted))
-                        .minute()
-                        .weekday(.abbreviated)
-                        .day()
-                        .month(.abbreviated)
-                ))
-                .font(.subheadline)
-                .foregroundColor(.gray)
-                //                .padding(.top, 12)
-                if let notes = workout.notes {
-                    Text(notes)
-                        .font(.subheadline)
-                        .foregroundColor(.white)
-                        .padding(.top, 4)
-                }
-            }
-            .padding(.top, 12)
-            ScrollView {
-                ForEach(workout.exercises) { exercise in
-                    Divider()
-                        .padding(.top, 24)
-                    HStack {
-                        Text(exercise.name)
-                            .font(.headline)
-                            .foregroundStyle(Color("PrimaryColor"))
-                        Spacer()
 
-                        moreButton
+                // MARK: Top Bar
+                HStack {
+                    Button(action: {
+                        isPresented = false
+                        print("Pressed")
+                    }) {
+                        Image(systemName: "xmark.square.fill")
+                            .symbolRenderingMode(.palette)
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .foregroundStyle(Color("PrimaryColor"), Color.black.opacity(0.3))
                     }
-                    .padding(.bottom, 12)
-                    Grid {
-                        GridRow {
-                            Text("Set")
-                                .gridColumnAlignment(.center)
-                            if workout.templateName != nil {
-                                Text("Target")
-                                    .gridColumnAlignment(.center)
-                            }
-                            if exercise.resistanceType == .weighted {
-                                Text("kg")
-                                    .gridColumnAlignment(.center)
-                            }
-                            if exercise.movementType == .Dynamic {
-                                Text("Reps")
-                                    .gridColumnAlignment(.center)
-                            } else if exercise.movementType == .Static {
-                                Text("Time")
-                                    .gridColumnAlignment(.center)
-                            }
-                            Text("RPE")
-                                .gridColumnAlignment(.center)
-                        }
-                        .font(.subheadline)
-                        .foregroundStyle(.gray)
-                        Divider()
-                        ForEach(exercise.sets) { set in
-                            GridRow {
-                                Text("\(set.setNumber)")
-                                    .foregroundStyle(.gray)
-                                // TODO: Add support for target range
-                                if let target = set.suggestedReps {
-                                    Text("\(target) reps")
-                                } else {
-                                    Text("-")
-                                        .foregroundStyle(.gray)
-                                }
-                                if exercise.resistanceType == .weighted {
-                                    Text("\(set.weight ?? 0, specifier: "%.0f")")
-                                    //                                TextField("\(set.weight ?? 0, specifier: "%.0f")", text: $set.weight)
-                                }
-                                if exercise.movementType == .Dynamic {
-                                    //                                    TextField("", text: $str)
-                                    //                                        .frame(maxWidth: 32, maxHeight: .infinity)
-                                    //                                        .multilineTextAlignment(.center)
-                                    //                                        .overlay(
-                                    //                                            RoundedRectangle(cornerSize: 10)
-                                    //                                                .stroke(Color.green, lineWidth: 2)
-                                    //                                        )
-                                    TextField("", text: $str)
-                                        .multilineTextAlignment(.center)
-                                        .frame(maxWidth: 20, maxHeight: 4, alignment: .center)
-                                        .padding()
-                                        .overlay(
-                                            RoundedRectangle(cornerRadius: 10)
-                                                .stroke(Color("PrimaryColor"), lineWidth: 2)
-                                        )
-                                    // Text("\(set.reps!)")
-                                    //      .gridColumnAlignment(.center)
-                                } else if exercise.movementType == .Static {
-                                    Text("\(set.duration!)")
-                                        .gridColumnAlignment(.center)
-                                        .frame(maxWidth: 25, maxHeight: 4, alignment: .center)
-                                        .padding()
-                                        .overlay(
-                                            RoundedRectangle(cornerRadius: 10)
-                                                .stroke(Color("PrimaryColor"), lineWidth: 2)
-                                        )
-                                }
-                                Text("\(set.rpe ?? 0)")
-                            }
-                        }
+                    .frame(width: 35, height: 35) // Define frame size
+                    Spacer()
+                    Text("Edit Workout")
+                        .font(.title2)
+                        .fontWeight(.bold)
+                        .foregroundColor(.white)
+                    Spacer()
+                    Button("Save") {
+                        print("Hi")
                     }
-                    .padding(.bottom)
-                    Button {
-                        print("Add something")
-                    } label: {
-                        Label("Add Set", systemImage: "plus")
-                    }
-                    .frame(minWidth: 0, maxWidth: .infinity)
-                    .padding(4)
+                    .padding(8)
                     .background(.black.opacity(0.3))
                     .clipShape(.buttonBorder)
-                    .foregroundStyle(Color("PrimaryLabel"))
+                    .foregroundStyle(Color("PrimaryColor"))
                     .fontWeight(.semibold)
                 }
 
-                // MARK: Add Exercise Button
-                Button {
-                    print("Add something")
-                } label: {
-                    Text("Add Exercise")
+                // MARK: Header - Name, Notes, Date
+                VStack(alignment: .leading, spacing: 12) {
+                    HStack {
+                        Text(workout.name)
+                            .font(.title)
+                            .fontWeight(.bold)
+                        Spacer()
+                        Button(action: {
+                            print("Editing the name of the workout")
+                        }) {
+                            Image(systemName: "pencil")
+                                .foregroundStyle(.white)
+                        }
+                    }
+                    Text(workout.date.formatted(
+                        .dateTime
+                            .hour(.defaultDigits(amPM: .omitted))
+                            .minute()
+                            .weekday(.abbreviated)
+                            .day()
+                            .month(.abbreviated)
+                    ))
+                    .font(.subheadline)
+                    .foregroundColor(.gray)
+                    if let notes = workout.notes {
+                        Text(notes)
+                            .font(.subheadline)
+                            .foregroundColor(.white)
+                            .padding(.top, 4)
+                    }
                 }
-                .frame(minWidth: 0, maxWidth: .infinity, maxHeight: 32)
-                .padding(12)
-                .background(.green.opacity(0.3))
-                .clipShape(.buttonBorder)
-                .foregroundStyle(Color("PrimaryColor"))
-                .fontWeight(.semibold)
+                .padding(.top, 12)
+                ScrollView {
+                    ForEach(workout.exercises) { exercise in
+                        Divider()
+                            .padding(.top, 24)
+                        HStack {
+                            Text(exercise.name)
+                                .font(.headline)
+                                .foregroundStyle(Color("PrimaryColor"))
+                            Spacer()
 
-                // MARK: Delete Exercise Button
-                Button {
-                    print("Delete Workout")
-                } label: {
-                    Text("Delete Workout")
+                            moreButton
+                        }
+                        .padding(.bottom, 12)
+                        Grid {
+                            GridRow {
+                                Text("Set")
+                                    .gridColumnAlignment(.center)
+                                if workout.templateName != nil {
+                                    Text("Target")
+                                        .gridColumnAlignment(.center)
+                                }
+                                if exercise.resistanceType == .weighted {
+                                    Text("kg")
+                                        .gridColumnAlignment(.center)
+                                }
+                                if exercise.movementType == .Dynamic {
+                                    Text("Reps")
+                                        .gridColumnAlignment(.center)
+                                } else if exercise.movementType == .Static {
+                                    Text("Time")
+                                        .gridColumnAlignment(.center)
+                                }
+                                Text("RPE")
+                                    .gridColumnAlignment(.center)
+                            }
+                            .font(.subheadline)
+                            .foregroundStyle(.gray)
+                            Divider()
+                            ForEach(exercise.sets) { set in
+                                GridRow {
+                                    Text("\(set.setNumber)")
+                                        .foregroundStyle(.gray)
+                                    // TODO: Add support for target range
+                                    if let target = set.suggestedReps {
+                                        Text("\(target) reps")
+                                    } else {
+                                        Text("-")
+                                            .foregroundStyle(.gray)
+                                    }
+                                    if exercise.resistanceType == .weighted {
+                                        Text("\(set.weight ?? 0, specifier: "%.0f")")
+                                    }
+                                    if exercise.movementType == .Dynamic {
+                                        TextField("", text: $str)
+                                            .multilineTextAlignment(.center)
+                                            .frame(maxWidth: 20, maxHeight: 4, alignment: .center)
+                                            .padding()
+                                            .overlay(
+                                                RoundedRectangle(cornerRadius: 10)
+                                                    .stroke(Color("PrimaryColor"), lineWidth: 2)
+                                            )
+                                    } else if exercise.movementType == .Static {
+                                        Text("\(set.duration!)")
+                                            .gridColumnAlignment(.center)
+                                            .frame(maxWidth: 25, maxHeight: 4, alignment: .center)
+                                            .padding()
+                                            .overlay(
+                                                RoundedRectangle(cornerRadius: 10)
+                                                    .stroke(Color("PrimaryColor"), lineWidth: 2)
+                                            )
+                                    }
+                                    Text("\(set.rpe ?? 0)")
+                                }
+                            }
+                        }
+                        .padding(.bottom)
+                        Button {
+                            print("Add something")
+                        } label: {
+                            Label("Add Set", systemImage: "plus")
+                        }
+                        .frame(minWidth: 0, maxWidth: .infinity)
+                        .padding(4)
+                        .background(.black.opacity(0.3))
+                        .clipShape(.buttonBorder)
+                        .foregroundStyle(Color("PrimaryLabel"))
+                        .fontWeight(.semibold)
+                    }
+
+                    // MARK: Add Exercise Button
+                    Button {
+                        print("Add something")
+                        self.showSearchExercises.toggle()
+                    } label: {
+                        Text("Add Exercise")
+                    }
+                    .frame(minWidth: 0, maxWidth: .infinity, maxHeight: 32)
+                    .padding(12)
+                    .background(.green.opacity(0.3))
+                    .clipShape(.buttonBorder)
+                    .foregroundStyle(Color("PrimaryColor"))
+                    .fontWeight(.semibold)
+
+                    // MARK: Delete Exercise Button
+                    Button {
+                        print("Delete Workout")
+                    } label: {
+                        Text("Delete Workout")
+                    }
+                    .frame(minWidth: 0, maxWidth: .infinity)
+                    .padding(12)
+                    .background(.cancel.opacity(0.3))
+                    .clipShape(.buttonBorder)
+                    .foregroundStyle(.cancel)
+                    .fontWeight(.semibold)
                 }
-                .frame(minWidth: 0, maxWidth: .infinity)
-                .padding(12)
-                .background(.cancel.opacity(0.3))
-                .clipShape(.buttonBorder)
-                .foregroundStyle(.cancel)
-                .fontWeight(.semibold)
+                .scrollIndicators(.hidden)
+            }
+            .padding()
+            .background(.secondaryBg)
+            if self.showSearchExercises {
+                ExerciseSearch(isPresented: $showSearchExercises)
             }
         }
-        .padding()
-        .background(.secondaryBg)
     }
 
     private var moreButton: some View {
@@ -229,5 +219,14 @@ struct EditWorkoutView: View {
 }
 
 #Preview {
-    EditWorkoutView(/*isPresented: true,*/ workout: testingWorkout)
+    // Wrapper view to provide the binding
+    struct PreviewWrapper: View {
+        @State var isPresented: Bool = true
+
+        var body: some View {
+            EditWorkoutView(workout: testingWorkout, isPresented: $isPresented)
+        }
+    }
+
+    return PreviewWrapper()
 }

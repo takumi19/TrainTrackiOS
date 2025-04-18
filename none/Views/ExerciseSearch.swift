@@ -7,11 +7,11 @@
 import SwiftUI
 
 struct ExerciseSearch: View {
-    @State var isPresented: Bool = true
+    @Binding var isPresented: Bool
     @State var isPicked: Bool = false
     @State private var searchTerm: String = ""
     @State var exercises: [ExerciseInfo] = []
-//    @State private var selection = Set<ExerciseInfo>()
+    @State private var selection = Set<Int>()
     @StateObject var exercisevm: ExerciseInfoViewModel = ExerciseInfoViewModel()
 
     @State var isLoading: Bool = false
@@ -33,7 +33,7 @@ struct ExerciseSearch: View {
                 HStack {
                     // TODO: Factor the close button out into a separate component
                     Button(action: {
-                        //  isPresented = false
+                        isPresented = false
                         print("Pressed")
                     }) {
                         Image(systemName: "xmark.square.fill")
@@ -42,12 +42,13 @@ struct ExerciseSearch: View {
                             .aspectRatio(contentMode: .fit)
                             .foregroundStyle(Color("PrimaryColor"), Color.black.opacity(0.3))
                     }
-                    .frame(width: 35, height: 35) // Define frame size
+                    .frame(width: 32, height: 32) // Define frame size
                     Button("New") {
                         print("New Execise Being Created")
                     }
                     .foregroundStyle(Color("PrimaryColor"))
-                    .frame(minWidth: 60)
+                    .frame(maxWidth: 36)
+//                    .font(.caption)
                     .fontWeight(.semibold)
                     Spacer()
 
@@ -57,17 +58,18 @@ struct ExerciseSearch: View {
                         Button("Superset") {
                             print("superset")
                         }
+                        .foregroundStyle(selection.count < 2 ? .gray : Color("PrimaryColor"))
                         Rectangle()
                             .frame(width: 2, height: 20)
                             .foregroundStyle(.gray)
                         Button("Add") {
                             print("add")
                         }
+                        .foregroundStyle(selection.isEmpty ? .gray : Color("PrimaryColor"))
                     }
                     .padding(.horizontal)
-                    .frame(height: 35) // Define frame size
+                    .frame(height: 32) // Define frame size
                     .background(.black.opacity(0.3))
-                    .foregroundStyle(isPicked ? Color("PrimaryColor") : .gray)
                     .clipShape(RoundedRectangle(cornerRadius: 10))
                     .fontWeight(.semibold)
                 } // Page Header
@@ -92,18 +94,25 @@ struct ExerciseSearch: View {
                 .padding(.horizontal)
 
                 // MARK: Exercise List
+                // TODO: Make it sorted by alphabet
                 List/*(selection: $selection)*/ {
                     if searchTerm.isEmpty {
                         ForEach(Array(exercisevm.groupedExercises.keys), id: \.self) { key in
                             Section(header: Text(key)) {
                                 ForEach(exercisevm.groupedExercises[key]!/*, id: \.id*/) { e in
-                                    ExerciseRow(exercise: e, selected: Int.random(in: 0...1) == 0)
+                                    ExerciseRow(exercise: e, selected: selection.contains(e.id))
+                                        .onTapGesture {
+                                            toggleSelection(e.id)
+                                        }
                                 }
                             }
                         }
                     } else {
                         ForEach(filteredExercises, id: \.id) { e in
-                            ExerciseRow(exercise: e, selected: Int.random(in: 0...1) == 0)
+                            ExerciseRow(exercise: e, selected: selection.contains(e.id))
+                                .onTapGesture {
+                                    toggleSelection(e.id)
+                                }
                         }
                     }
                 }
@@ -117,18 +126,26 @@ struct ExerciseSearch: View {
 
                 Spacer()
             }
-            .frame(width: 350, height: 570) // Adjusted size to fit content
+            .frame(width: 350, height: 650) // Adjusted size to fit content
             .shadow(radius: 10)
             .animation(.easeInOut(duration: 0.5), value: isPresented)
             .background(Color("SecondaryBg"))
             .clipShape(.rect(cornerRadius: 10))
         }
     }
+
+    private func toggleSelection(_ id: Int) {
+        if selection.contains(id) {
+            selection.remove(id)
+        } else {
+            selection.insert(id)
+        }
+    }
 }
 
 struct ExerciseRow: View {
     @State var exercise: ExerciseInfo
-    var selected: Bool = false
+    var selected: Bool
 
     var body: some View {
         HStack {
@@ -140,6 +157,7 @@ struct ExerciseRow: View {
                     .clipShape(Circle())
             } placeholder: {
                 ProgressView()
+                    .frame(maxWidth: 50, maxHeight: 50)
             }
             VStack(alignment: .leading) {
                 Text(exercise.name)
@@ -148,13 +166,16 @@ struct ExerciseRow: View {
                 Text(exercise.muscleGroups.joined(separator: ", "))
                     .foregroundStyle(.secondaryLabel)
             }
+            .padding(.horizontal, 8)
             Spacer()
             if selected {
                 Image(systemName: "checkmark")
                     .foregroundStyle(Color("PrimaryColor"))
+                    .frame(maxWidth: 24, maxHeight: 24)
             }
         }
 //        .background(selected ? Color("PrimaryColor").opacity(0.3) : Color.clear)
+        .listRowSeparator(selected ? Visibility.hidden : Visibility.visible)
         .listRowBackground(selected ? Color("PrimaryColor").opacity(0.3) : Color.clear)
         .listRowSpacing(16)
     }
@@ -165,6 +186,6 @@ struct ExerciseRow: View {
     ZStack {
         Color.black
             .ignoresSafeArea()
-        ExerciseSearch()
+//        ExerciseSearch()
     }
 }

@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Workout: Identifiable {
+struct Workout: Identifiable, Hashable {
     var id: Int                // Id of the workout
     var date: Date             // Date of execution
     var templateName: String?   // If part of a program
@@ -20,7 +20,7 @@ struct Workout: Identifiable {
     var exercises: [Exercise]   // Exercises of the workout
 }
 
-struct Exercise: Identifiable {
+struct Exercise: Identifiable, Hashable {
     var id: Int
     var name: String
     var exerciseNumber: Int
@@ -40,7 +40,7 @@ enum ResistanceType {
     case bodyweight
 }
 
-struct SetDetail: Identifiable {
+struct SetDetail: Identifiable, Hashable {
     var id: Int
     var setNumber: Int
     var rpe: Int? // Optional

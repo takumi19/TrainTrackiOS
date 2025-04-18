@@ -14,21 +14,32 @@ extension Date {
 }
 
 class HistoryViewModel: ObservableObject {
-    @Published private var workouts: [Workout] = []
+    @Published private var workouts: [Workout]
 
+    init() {
+        self.workouts = []
+    }
     init(workouts: [Workout]) {
         self.workouts = workouts
     }
 
-    init(userId: Int) {
-        fetchWorkouts(userId)
-    }
+//    init(userId: Int) {
+//        await fetchWorkouts()
+//    }
 
-    private func fetchWorkouts(_ userId: Int) {
-        var url = AppEnv.versionedServerURL()
-
-        
-    }
+//    func fetchWorkouts() async {
+//        APIManager.shared.getUserLogs { [self] result in
+//            switch result {
+//            case .success(let workouts):
+//                print("got the workouts")
+//                self.workouts = workouts
+//                print(self.workouts)
+//
+//            case .failure(let error):
+//                print(error.localizedDescription)
+//            }
+//        }
+//    }
 
     func addWorkout(_ workout: Workout) {
         workouts.append(workout)

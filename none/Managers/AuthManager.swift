@@ -1,21 +1,20 @@
 import SwiftUI
 
 struct AuthResponse: Codable {
+    var id: Int64
     var token: String
 }
 
 class AuthManager: ObservableObject {
+    static let shared = AuthManager()
     @Published var authenticated: Bool = false
     private var user: UserModel?
 
-    func login(fullName: String, login: String, email: String, password: String) throws {
+    func login(email: String, password: String) throws {
         // user = UserModel(fullName: fullName, login: login, email: email)
-        let user = ["full_name": fullName,
-                    "login": login,
-                    "email": email,
+        let user = ["email": email,
                     "password": password]
 
-        let js = JSONSerialization()
         let body = try! JSONSerialization.data(withJSONObject: user)
         print("Serialized into JSON")
 
@@ -32,12 +31,22 @@ class AuthManager: ObservableObject {
 
         URLSession.shared.dataTask(with: req) { (data, response, error) in
 
+            print("Parsing the response")
             guard let data = data else { return }
             let resData = try! JSONDecoder().decode(AuthResponse.self, from: data)
             print("Received token: \(resData.token)")
 
         }.resume()
+        print("Sent the response")
 
+    }
+
+    func validateEmail(_ email: String) -> Bool {
+        let emailValidationRegex = "^[\\p{L}0-9!#$%&'*+\\/=?^_`{|}~-][\\p{L}0-9.!#$%&'*+\\/=?^_`{|}~-]{0,63}@[\\p{L}0-9-]+(?:\\.[\\p{L}0-9-]{2,7})*$"
+
+        let emailValidationPredicate = NSPredicate(format: "SELF MATCHES %@", emailValidationRegex)
+
+        return emailValidationPredicate.evaluate(with: email)
     }
 }
 

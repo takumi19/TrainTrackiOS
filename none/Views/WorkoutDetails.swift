@@ -10,6 +10,7 @@ import SwiftUI
 struct WorkoutDetailsView: View {
     @Binding var isPresented: Bool
     var workout: Workout
+    @Binding var showEditing: Bool
 
 //    init(@Binding isPresented: Bool, workout: Workout) {
 //        self.isPresented = isPresented
@@ -28,10 +29,13 @@ struct WorkoutDetailsView: View {
                     Button(action: {
                         isPresented = false
                     }) {
-                        Image(systemName: "xmark")
-                            .foregroundColor(Color("PrimaryColor"))
-                            .font(.title2)
+                        Image(systemName: "xmark.square.fill")
+                            .symbolRenderingMode(.palette)
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .foregroundStyle(Color("PrimaryColor"), Color.black.opacity(0.3))
                     }
+                    .frame(width: 32, height: 32) // Define frame size
                     Spacer()
                     Text(workout.templateName ?? workout.name)
                         .font(.title2)
@@ -40,7 +44,9 @@ struct WorkoutDetailsView: View {
                     Spacer()
                     Button(action: {
                         isPresented = false
-                        print("Editing")
+                        showEditing = true
+//                        EditWorkoutView(workout: workout)
+//                        print("Editing")
                     }) {
                         Text("Edit")
                             .foregroundColor(Color("PrimaryColor"))
@@ -132,6 +138,7 @@ struct WorkoutDetailsView: View {
                         }
                     }
                 }
+                .scrollIndicators(.hidden)
             }
             .frame(width: 350, height: 570) // Adjusted size to fit content
             .shadow(radius: 10)
