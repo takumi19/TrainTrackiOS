@@ -9,14 +9,15 @@ import SwiftUI
 
 @main
 struct noneApp: App {
-    @AppStorage("logged_in") var logged_in: Bool = true
+    @AppStorage("logged_in") var logged_in: Bool = false
     var body: some Scene {
         WindowGroup {
             if logged_in {
                 ContentView()
                     .preferredColorScheme(.dark)
             } else {
-                LoginView()
+                AuthView()
+                    .preferredColorScheme(.dark)
             }
         }
     }

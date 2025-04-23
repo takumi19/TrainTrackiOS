@@ -11,7 +11,7 @@ class ExerciseInfoViewModel: ObservableObject {
     @Published var exercises: [ExerciseInfo] = []
     @Published var groupedExercises: [String: [ExerciseInfo]] = [:]
 
-    func fetchExercises() async {
+    func fetchExercises() {
         APIManager.shared.listExercises { [self] result in
             DispatchQueue.main.async {
                 switch result {

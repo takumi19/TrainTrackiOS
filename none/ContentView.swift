@@ -28,7 +28,7 @@ struct ContentView: View {
                     Image(systemName: "person.2.fill")
                 }
 
-            ChatView()
+            ChatsView(viewModel: ChatViewModel())
                 .tabItem {
                     Image(systemName: "message.fill")
                 }
@@ -39,12 +39,12 @@ struct ContentView: View {
                     Image(systemName: "doc.text.fill")
                 }
 
-            Text("Templates View")
+            ProgramsView()
                 .tabItem {
                     Image(systemName: "square.grid.2x2.fill")
                 }
 
-            Text("Profile View")
+            ProfileView()
                 .tabItem {
                     Image(systemName: "person.crop.circle")
                 }

@@ -6,12 +6,15 @@
 //
 
 import Foundation
+import SwiftUI
 
 class APIManager {
     static let shared = APIManager()
     // JWT Access Token
     private var accessToken: String = ""
-    private var userId: Int64 = 1
+    private(set) var userId: Int64 = 1
+
+    @AppStorage("logged_in") var logged_in: Bool = false
 
     func login(email: String, password: String) /*throws*/ {
         // user = UserModel(fullName: fullName, login: login, email: email)
@@ -31,9 +34,11 @@ class APIManager {
 
         URLSession.shared.dataTask(with: req) { (data, response, error) in
             guard let data = data else { return }
+            guard error == nil else { return }
             let resData = try! JSONDecoder().decode(AuthResponse.self, from: data)
             self.accessToken = resData.token
             self.userId = resData.id
+            self.logged_in = true
             print("Received token: \(resData.token)")
         }.resume()
     }
@@ -58,9 +63,11 @@ class APIManager {
 
         URLSession.shared.dataTask(with: req) { (data, response, error) in
             guard let data = data else { return }
+            guard error == nil else { return }
             let resData = try! JSONDecoder().decode(AuthResponse.self, from: data)
             self.accessToken = resData.token
             self.userId = resData.id
+            self.logged_in = true
             print("Received token: \(resData.token)")
         }.resume()
     }

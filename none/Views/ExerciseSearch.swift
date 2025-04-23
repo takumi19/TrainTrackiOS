@@ -117,8 +117,7 @@ struct ExerciseSearch: View {
                     }
                 }
                 .task {
-                    print("hi")
-                    await exercisevm.fetchExercises()
+                    exercisevm.fetchExercises()
                 } // Exercise List
                 .listStyle(.grouped)
                 .scrollContentBackground(.hidden)
