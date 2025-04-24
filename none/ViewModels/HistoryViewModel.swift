@@ -19,31 +19,37 @@ class HistoryViewModel: ObservableObject {
     init() {
         self.workouts = []
     }
+
     init(workouts: [Workout]) {
         self.workouts = workouts
     }
 
-//    init(userId: Int) {
-//        await fetchWorkouts()
-//    }
+    subscript(index: Int) -> Workout {
+        get {
+            workouts[index]
+        }
+        set(newValue) {
+            workouts[index] = newValue
+        }
+    }
 
-//    func fetchWorkouts() async {
-//        APIManager.shared.getUserLogs { [self] result in
-//            switch result {
-//            case .success(let workouts):
-//                print("got the workouts")
-//                self.workouts = workouts
-//                print(self.workouts)
-//
-//            case .failure(let error):
-//                print(error.localizedDescription)
-//            }
-//        }
-//    }
+    func fetch() {
+        APIManager.shared.getUserLogs { result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let workouts):
+                    print(workouts)
+                    self.workouts = workouts
+                case .failure(let error):
+                    print("Error fetching workouts: \(error)")
+                }
+            }
+        }
+    }
 
     func addWorkout(_ workout: Workout) {
         workouts.append(workout)
-        workouts.sort { $0.date > $1.date } // Sort by latest date
+//        workouts.sort { $0.date > $1.date } // Sort by latest date
     }
 
     func formatDate(_ date: Date) -> String {

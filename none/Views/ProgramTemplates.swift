@@ -204,16 +204,6 @@ struct ProgramsView: View {
                                 .symbolRenderingMode(.monochrome) // Ensure consistent styling
                         }
                         // ---
-
-//                        Button {
-//                            print("PLUS")
-//                        } label: {
-//                            Image(systemName: "plus")
-//                                .foregroundStyle(Color("PrimaryColor"))
-//                                .font(.system(size: 20, weight: .bold)) // Increase size and weight
-//                                .symbolRenderingMode(.monochrome) // Ensure consistent styling
-//                            //                            .imageScale(.large) // Optional: Adjust scale if needed
-//                        }
                     }
 
                     ForEach(programs) { program in

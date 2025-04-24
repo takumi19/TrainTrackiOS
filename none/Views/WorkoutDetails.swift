@@ -109,9 +109,9 @@ struct WorkoutDetailsView: View {
                             Divider()
 
                             // Sets
-                            ForEach(exercise.sets) { set in
+                            ForEach(Array(exercise.sets.enumerated()), id: \.offset) { index, set in
                                 GridRow {
-                                    Text("\(set.setNumber)")
+                                    Text("\(index + 1)")
                                         .foregroundStyle(.gray)
 
                                     // TODO: Add support for target range

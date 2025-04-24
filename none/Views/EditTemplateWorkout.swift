@@ -186,9 +186,9 @@ struct TemplateExerciseGrid: View {
             Divider()
 
             // MARK: Set Table
-            ForEach(exercise.sets) { set in
+            ForEach(Array(exercise.sets.enumerated()), id: \.offset) { index, set in
                 GridRow {
-                    Text("\(set.setNumber)")
+                    Text("\(index)")
                         .foregroundStyle(.gray)
 
                     // TODO: Add support for target range

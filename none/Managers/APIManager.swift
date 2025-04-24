@@ -119,44 +119,45 @@ class APIManager {
         task.resume()
     }
 
-//    func getUserLogs(completed: @escaping (Result<[Workout], APIError>) -> Void) {
-//        guard let url = URL(string: AppEnv.serverBaseURL + "v1/users/\(userId)/logs") else {
-//            // throw AuthError.invalidURL
-//            return
-//        }
-//
-//        var request = URLRequest(url: url)
-//        request.httpMethod = "GET"
-//
-//        // Perform HTTP Request
-//        let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
-//            if let _ = error {
-//                completed(.failure(.unableToComplete))
-//                return
-//            }
-//
-//            guard let response = response as? HTTPURLResponse, response.statusCode == 200 else {
-//                completed(.failure(.invalidResponse))
-//                return
-//            }
-//
-//            guard let data = data else {
-//                completed(.failure(.invalidData))
-//                return
-//            }
-//
-//            do {
-//                let decoder = JSONDecoder()
-//                decoder.keyDecodingStrategy = .convertFromSnakeCase
-//                let decodedResponse = try decoder.decode([Workout].self, from: data)
-//                completed(.success(decodedResponse))
-//            } catch let err {
-//                print(err.localizedDescription)
-//                completed(.failure(.invalidData))
-//            }
-//        }
-//        task.resume()
-//    }
+    func getUserLogs(completed: @escaping (Result<[Workout], APIError>) -> Void) {
+        guard let url = URL(string: AppEnv.serverBaseURL + "v1/users/\(userId)/logs") else {
+            // throw AuthError.invalidURL
+            return
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+
+        // Perform HTTP Request
+        let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
+            if let _ = error {
+                completed(.failure(.unableToComplete))
+                return
+            }
+
+            guard let response = response as? HTTPURLResponse, response.statusCode == 200 else {
+                completed(.failure(.invalidResponse))
+                return
+            }
+
+            guard let data = data else {
+                completed(.failure(.invalidData))
+                return
+            }
+
+            do {
+                let decoder = JSONDecoder()
+                decoder.keyDecodingStrategy = .convertFromSnakeCase
+                decoder.dateDecodingStrategy = .iso8601
+                let decodedResponse = try decoder.decode([Workout].self, from: data)
+                completed(.success(decodedResponse))
+            } catch let err {
+                print(err.localizedDescription)
+                completed(.failure(.invalidData))
+            }
+        }
+        task.resume()
+    }
 }
 
 enum APIError: Error {

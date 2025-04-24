@@ -51,9 +51,9 @@ struct ProgramWorkoutCardView: View {
             }
 
             Spacer().frame(maxHeight: 30)
-            ForEach(workout.exercises) { exercise in
+            ForEach(Array(workout.exercises.enumerated()), id: \.offset) { index, exercise in
                 HStack(alignment: .top) {
-                    Text("\(exercise.exerciseNumber)")
+                    Text("\(index)")
                         .foregroundStyle(.secondaryAccent)
                         .fontWeight(.semibold)
                     VStack(alignment: .leading) {

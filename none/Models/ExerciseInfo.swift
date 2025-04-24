@@ -15,3 +15,13 @@ struct ExerciseInfo: Identifiable, Codable {
     var isBodyweight: Bool
     var muscleGroups: [String]
 }
+
+extension ExerciseInfo {
+    func printNameAndNotes() -> String {
+        var result = "\(name)"
+        if let notes = notes {
+            result += " (\(notes))"
+        }
+        return result
+    }
+}

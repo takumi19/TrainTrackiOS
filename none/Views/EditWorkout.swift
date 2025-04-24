@@ -7,10 +7,11 @@
 import SwiftUI
 
 struct EditWorkoutView: View {
-    var workout: Workout
+    @Binding var workout: Workout
     @Binding var isPresented: Bool
     @State var showSearchExercises: Bool = false
     @State var str: String = "1"
+//    @ObservedObject var vm: WorkoutViewModel = WorkoutViewModel(workout: workout)
 
     var body: some View {
         ZStack {
@@ -69,12 +70,13 @@ struct EditWorkoutView: View {
                     ))
                     .font(.subheadline)
                     .foregroundColor(.gray)
-                    if let notes = workout.notes {
-                        Text(notes)
-                            .font(.subheadline)
-                            .foregroundColor(.white)
-                            .padding(.top, 4)
-                    }
+                    TextField("Notes", text: Binding(
+                        get: { workout.notes ?? "" },
+                        set: { workout.notes = $0 }
+                    ))
+                    .font(.subheadline)
+                    .foregroundColor(.white)
+                    .padding(.top, 4)
                 }
                 .padding(.top, 12)
                 ScrollView {
@@ -115,9 +117,9 @@ struct EditWorkoutView: View {
                             .font(.subheadline)
                             .foregroundStyle(.gray)
                             Divider()
-                            ForEach(exercise.sets) { set in
+                            ForEach(Array(exercise.sets.enumerated()), id: \.offset) { index, set in
                                 GridRow {
-                                    Text("\(set.setNumber)")
+                                    Text("\(index + 1)")
                                         .foregroundStyle(.gray)
                                     // TODO: Add support for target range
                                     if let target = set.suggestedReps {
@@ -130,6 +132,31 @@ struct EditWorkoutView: View {
                                         Text("\(set.weight ?? 0, specifier: "%.0f")")
                                     }
                                     if exercise.movementType == .Dynamic {
+//                                        TextField("", text: Binding(
+//                                            get: {
+//                                                // Convert Int? to String, use "" if nil
+//                                                if let reps = set.reps {
+//                                                    return String(reps)
+//                                                } else {
+//                                                    return ""
+//                                                }
+//                                            },
+//                                            set: { newValue in
+//                                                // Convert String back to Int?, set to nil if empty or invalid
+//                                                if let intValue = Int(newValue) {
+//                                                    set.reps = intValue
+//                                                } else {
+//                                                    set.reps = nil // Handle empty or invalid input as nil
+//                                                }
+//                                            }
+//                                        ))
+//                                        .multilineTextAlignment(.center)
+//                                        .frame(maxWidth: 20, maxHeight: 4, alignment: .center)
+//                                        .padding()
+//                                        .overlay(
+//                                            RoundedRectangle(cornerRadius: 10)
+//                                                .stroke(Color("PrimaryColor"), lineWidth: 2)
+//                                        )
                                         TextField("", text: $str)
                                             .multilineTextAlignment(.center)
                                             .frame(maxWidth: 20, maxHeight: 4, alignment: .center)
@@ -179,6 +206,7 @@ struct EditWorkoutView: View {
                     .clipShape(.buttonBorder)
                     .foregroundStyle(Color("PrimaryColor"))
                     .fontWeight(.semibold)
+                    .padding(.vertical)
 
                     // MARK: Delete Exercise Button
                     Button {
@@ -222,9 +250,10 @@ struct EditWorkoutView: View {
     // Wrapper view to provide the binding
     struct PreviewWrapper: View {
         @State var isPresented: Bool = true
+        @State var workout = testingWorkout
 
         var body: some View {
-            EditWorkoutView(workout: testingWorkout, isPresented: $isPresented)
+            EditWorkoutView(workout: $workout, isPresented: $isPresented)
         }
     }
 
