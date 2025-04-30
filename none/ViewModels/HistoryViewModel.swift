@@ -15,6 +15,21 @@ extension Date {
 
 class HistoryViewModel: ObservableObject {
     @Published private var workouts: [Workout]
+    @Published var chosenWorkoutIndex: Int?
+
+    /// If chosenWorkoutIndex is nil, this thing appends the workout to the list
+    /// Otherwise it updates the workout at chosenWorkoutIndex
+    lazy var onSave: (Workout) -> Void = { [weak self] updated in
+        guard let self else { return }
+
+        if let idx = chosenWorkoutIndex, workouts.indices.contains(idx) {
+            workouts[idx] = updated
+        } else {
+            workouts.append(updated)
+        }
+
+        self.chosenWorkoutIndex = nil
+    }
 
     init() {
         self.workouts = []
@@ -120,10 +135,13 @@ class HistoryViewModel: ObservableObject {
 
     func groupedWorkouts() -> [(month: String, workouts: [Workout])] {
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "MMMM, yyyy" // e.g., "March, 2025"
+        dateFormatter.dateFormat = "MMMM, yyyy"
 
         let grouped = Dictionary(grouping: sortedByDate()) { workout in
             dateFormatter.string(from: workout.date)
+        }
+        for w in sortedByDate() {
+            print(w.notes ?? "NO NOTES")
         }
 
         return grouped.map { (month: $0.key, workouts: $0.value) }

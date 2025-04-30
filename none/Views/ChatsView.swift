@@ -39,11 +39,11 @@ struct ChatsView: View {
     var body: some View {
         NavigationStack {
             List {
-                ForEach(0..<10) { index in
-                    NavigationLink(value: index) {
+//                ForEach(0..<10) { index in
+                    NavigationLink(value: 0) {
                         ChatCard()
                     }
-                }
+//                }
             }
             .listStyle(.grouped)
             .scrollContentBackground(.hidden)
@@ -63,19 +63,25 @@ struct ChatCard: View {
 
     var body: some View {
         HStack {
-            Image(systemName: "person.fill")
+            Image("andrey-pfp")
                 .resizable()
                 .aspectRatio(contentMode: .fit)
 //                .frame(maxWidth: 32, maxHeight: 32)
 //                .frame(alignment: .centerFirstTextBaseline)
                 .clipShape(Circle())
+//            Image(systemName: "person.fill")
+//                .resizable()
+//                .aspectRatio(contentMode: .fit)
+////                .frame(maxWidth: 32, maxHeight: 32)
+////                .frame(alignment: .centerFirstTextBaseline)
+//                .clipShape(Circle())
 
             Spacer().frame(maxWidth: 12)
 
             VStack(alignment: .leading, spacing: 12) {
-                Text("Name")
+                Text("Andrey")
                     .font(.headline)
-                Text("lorem ipsum i dont know what the hell i am writing i do not remember this fucking latin placeholder text what the actual hell")
+                Text("Np! Let me know if you have any questions. How are you?")
                     .font(.subheadline)
                     .foregroundStyle(.secondaryLabel)
                     .lineLimit(1)

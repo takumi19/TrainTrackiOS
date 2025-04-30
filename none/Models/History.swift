@@ -31,6 +31,24 @@ struct Exercise: Identifiable, Hashable, Codable {
     var resistanceType: ResistanceType
     var bestSet: String
     var sets: [SetDetail]
+
+    init(id: Int, name: String, movementType: MovementType, resistanceType: ResistanceType, bestSet: String, sets: [SetDetail]) {
+        self.id = id
+        self.name = name
+        self.movementType = movementType
+        self.resistanceType = resistanceType
+        self.bestSet = bestSet
+        self.sets = sets
+    }
+
+    init(info: ExerciseInfo) {
+        self.id = Int.random(in: 100..<1000)
+        self.name = info.name
+        self.resistanceType = info.isBodyweight ? .bodyweight : .weighted
+        self.movementType = info.isRepBased ? .Dynamic : .Static
+        self.bestSet = "90 kg x 10"
+        self.sets = []
+    }
 }
 
 enum MovementType: Int, Codable {
@@ -61,56 +79,3 @@ struct SetDetail: Identifiable, Hashable, Codable {
 
     var notes: String?
 }
-
-//struct Workout: Identifiable, Hashable, Codable {
-//    var id: Int                // Id of the workout
-//    var date: Date             // Date of execution
-//    var templateName: String?   // If part of a program
-//    var weekNumber: Int?       // number of the week in the program it belongs to
-//    var tonnage: Int           // Tonnage in kilograms
-//    var prCount: Int?          // Number of PRs in the workout
-//    var name: String           // Name of the workout
-//    var notes: String?         // Notes on the workout
-//    var duration: Int  // Duration of the workout in seconds
-//    var exercises: [Exercise]   // Exercises of the workout
-//}
-//
-//struct Exercise: Identifiable, Hashable, Codable {
-//    var id: Int
-//    var name: String
-//    var exerciseNumber: Int
-//    var movementType: MovementType
-//    var resistanceType: ResistanceType
-//    var bestSet: String
-//    var sets: [SetDetail]
-//}
-//
-//enum MovementType: Int, Codable {
-//    case Dynamic
-//    case Static
-//}
-//
-//enum ResistanceType: Int, Codable {
-//    case weighted
-//    case bodyweight
-//}
-//
-//struct SetDetail: Identifiable, Hashable, Codable {
-//    var id: Int
-////    var setNumber: Int
-//    var rpe: Int? // Optional
-//
-//    var suggestedRepsMin: Int?
-//    var suggestedRepsMax: Int?
-//    var suggestedReps: Int? // For dynamic exercises
-//
-//    var suggestedTimeMin: Int?
-//    var suggestedTimeMax: Int?
-//    var suggestedTime: Int? // For dynamic exercises
-//
-//    var reps: Int?
-//    var duration: Int? // For static exercises
-//    var weight: Double? // For weighted exercises
-//
-//    var notes: String?
-//}

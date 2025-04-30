@@ -11,6 +11,7 @@ struct ChatView: View {
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
     @Environment(\.dismiss) var dismiss
     @State var newMessage: String = ""
+    @State var msgs: [MessageModel] = MessageModel.generateDummyMessages(count: 2)
 
     var btnBack : some View { Button(action: {
         self.presentationMode.wrappedValue.dismiss()
@@ -28,7 +29,7 @@ struct ChatView: View {
         VStack {
             ScrollView {
                 LazyVStack {
-                    ForEach(MessageModel.generateDummyMessages(count: 5)) { msg in
+                    ForEach(msgs) { msg in
                         MessageCell(message: msg)
                     }
                 }
@@ -49,6 +50,12 @@ struct ChatView: View {
                         RoundedRectangle(cornerRadius: 20)
                             .stroke(Color.gray.opacity(0.5), lineWidth: 1)
                     )
+                    .onSubmit {
+                        // TODO: finish this
+                        print("Message submitted")
+                        self.msgs.append(MessageModel(id: UUID(), authorId: 1, textContent: newMessage, sentAt: Date.now))
+                        self.newMessage = ""
+                    }
 
                 Button(action: {
                     print("hi")

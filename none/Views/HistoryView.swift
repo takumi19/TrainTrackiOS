@@ -20,15 +20,7 @@ struct WorkoutCardView: View {
                     Menu {
                         Button {
                         } label: {
-                            Label("Start Program", systemImage: "rectangle.stack.badge.plus")
-                        }
-                        Button {
-                        } label: {
                             Label("Edit", systemImage: "folder.badge.plus")
-                        }
-                        Button {
-                        } label: {
-                            Label("Manage Access", systemImage: "rectangle.stack.badge.person.crop")
                         }
                         Button {
                         } label: {
@@ -134,7 +126,7 @@ struct WorkoutCardView: View {
 
 // MARK: Main Training Logs Page
 struct HistoryView : View {
-    @ObservedObject var workouts: HistoryViewModel = HistoryViewModel()
+    @StateObject var workouts: HistoryViewModel = HistoryViewModel()
     private var prevMonth: Int?
     @State private var chosenWorkout: Workout = Workout()
     @State private var showDetails: Bool = false
@@ -144,10 +136,10 @@ struct HistoryView : View {
         UINavigationBar.appearance().largeTitleTextAttributes = [.font : UIFont.systemFont(ofSize: 32, weight: .bold, width: .condensed)]
     }
 
-    init(workouts: HistoryViewModel) {
-        self.workouts = workouts
-        UINavigationBar.appearance().largeTitleTextAttributes = [.font : UIFont.systemFont(ofSize: 32, weight: .bold, width: .condensed)]
-    }
+//    init(workouts: HistoryViewModel) {
+//        self.workouts = workouts
+//        UINavigationBar.appearance().largeTitleTextAttributes = [.font : UIFont.systemFont(ofSize: 32, weight: .bold, width: .condensed)]
+//    }
 
     var body : some View {
 //        NavigationStack {
@@ -160,8 +152,8 @@ struct HistoryView : View {
                             .fontWeight(.bold)
                         Spacer()
                         Button(action: {
-                            self.showEditing.toggle()
                             chosenWorkout = Workout()
+                            self.showEditing.toggle()
                         }) {
                             Image(systemName: "plus")
                                 .foregroundStyle(Color("PrimaryColor"))
@@ -178,13 +170,14 @@ struct HistoryView : View {
                                 .fontWeight(.semibold)
                                 .padding(.bottom, 8)
 
-                            ForEach(section.workouts) { workout in
+                            ForEach(Array(section.workouts.enumerated()), id: \.offset) { index, workout in
 //                                NavigationLink(value: workout) {
                                     WorkoutCardView(workout: workout)
                                         .padding(.bottom, 16)
                                         .onTapGesture {
                                             showDetails.toggle()
                                             chosenWorkout = workout
+                                            workouts.chosenWorkoutIndex = index
                                         }
 //                                }
 //                                .buttonStyle(.plain)
@@ -196,19 +189,29 @@ struct HistoryView : View {
                 .scrollIndicators(.hidden)
                 .padding(.horizontal, 16)
                 if showDetails {
+                    Color.black.opacity(0.4)
+                        .ignoresSafeArea()
+                        .onTapGesture {
+//                            showDetails.toggle()
+                            withAnimation { showDetails = false }
+                        }
+                        .transition(.opacity)
+                        .zIndex(1)
                     WorkoutDetailsView(isPresented: $showDetails, workout: chosenWorkout, showEditing: $showEditing)
+                        .transition(.popUp)
+                        .zIndex(2)
                 }
 
                 if showEditing {
-//                    EditWorkoutView(workout: $chosenWorkout, isPresented: $showEditing)
-                    Tester(workout: $chosenWorkout, isPresented: $showEditing)
-//                        .animation(.easeIn(duration: 0.3), value: showEditing)
+                    EditWorkoutView(workout: chosenWorkout, isPresented: $showEditing, onSave: workouts.onSave)
                 }
             }
             .background(Color("PrimaryBg"))
             .task {
-                self.workouts.fetch()
+                workouts.fetch()
             }
+            .animation(.spring(response: 0.2, dampingFraction: 0.8),
+                       value: showDetails)
 //            .navigationTitle("History")
 //            .navigationBarTitleDisplayMode(.large)
 //            .navigationDestination(for: Workout.self) { workout in
@@ -415,6 +418,16 @@ let testingWorkout1 = Workout(
         )
     ]
 )
+
+extension AnyTransition {
+    static var popUp: AnyTransition {
+        .asymmetric(
+            insertion: .scale(scale: 0.8, anchor: .center)
+                       .combined(with: .opacity),
+            removal:   .opacity
+        )
+    }
+}
 
 #Preview {
     HistoryView()

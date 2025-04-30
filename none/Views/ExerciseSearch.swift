@@ -6,11 +6,18 @@
 //
 import SwiftUI
 
+extension Workout {
+    mutating func addExercise(_ exercise: Exercise) {
+        self.exercises.append(exercise)
+    }
+}
+
 struct ExerciseSearch: View {
     @Binding var isPresented: Bool
     @State var isPicked: Bool = false
     @State private var searchTerm: String = ""
     @State var exercises: [ExerciseInfo] = []
+    @Binding var workout: Workout
     @State private var selection = Set<Int>()
     @StateObject var exercisevm: ExerciseInfoViewModel = ExerciseInfoViewModel()
 
@@ -42,7 +49,7 @@ struct ExerciseSearch: View {
                             .aspectRatio(contentMode: .fit)
                             .foregroundStyle(Color("PrimaryColor"), Color.black.opacity(0.3))
                     }
-                    .frame(width: 32, height: 32) // Define frame size
+                    .frame(width: 32, height: 32)
                     Button("New") {
                         print("New Execise Being Created")
                     }
@@ -63,7 +70,17 @@ struct ExerciseSearch: View {
                             .frame(width: 2, height: 20)
                             .foregroundStyle(.gray)
                         Button("Add") {
-                            print("add")
+                            for id in selection {
+                                print("ID: \(id)")
+                                if let idx = exercisevm.exercises.firstIndex(where: { $0.id == id }) {
+                                    workout.addExercise(Exercise(info: exercisevm.exercises[idx]))
+                                }
+//                                if self.exercisevm.exercises.indices.contains(id) {
+//                                    self.workout.addExercise(Exercise(info: self.exercisevm.exercises[id]))
+//                                }
+                            }
+                            self.isPresented.toggle()
+                            print("added")
                         }
                         .foregroundStyle(selection.isEmpty ? .gray : Color("PrimaryColor"))
                     }
@@ -81,7 +98,6 @@ struct ExerciseSearch: View {
                     Image(systemName: "magnifyingglass")
                         .foregroundStyle(.secondaryLabel)
                     TextField("Search bar", text: $searchTerm) {
-                        print("NIGGER")
                     }
                 }
                 .padding()
@@ -148,7 +164,7 @@ struct ExerciseRow: View {
 
     var body: some View {
         HStack {
-            AsyncImage(url: URL(string: "https://i.ytimg.com/vi/ukQrg5d6Z20/maxresdefault.jpg")) { image in
+            AsyncImage(url: URL(string: "https://vectorified.com/image/bench-press-vector-25.png")) { image in
                 image
                     .resizable()
                     .aspectRatio(contentMode: .fill)

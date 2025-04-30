@@ -13,10 +13,15 @@ extension MessageModel {
         let now = Date()
         for i in 0..<count {
             let isEven = i % 2 == 0
-            let authorId: Int64 = isEven ? 1 : 0 // Alternate author IDs
-            let textContent = "This is a dummy message \(i+1). " + (isEven ? "From Author 1." : "From Author 2.") + " Some more text to make it longer."
-            let sentAt = now.addingTimeInterval(TimeInterval(i * 60)) // Messages sent a minute apart
-            let editedAt = isEven ? now.addingTimeInterval(TimeInterval(i * 60 + 300)) : nil // Some messages are edited
+            let authorId: Int64 = isEven ? 1 : 0
+            var textContent: String
+            if !isEven {
+                textContent = "Np! Let me know if you have any questions. How are you?"
+            } else {
+                textContent = "Thanks for the program, it really helped me out!"
+            }
+            let sentAt = now.addingTimeInterval(TimeInterval(i * 60))
+            let editedAt = isEven ? now.addingTimeInterval(TimeInterval(i * 60 + 300)) : nil
             messages.append(
                 MessageModel(authorId: authorId, textContent: textContent, sentAt: sentAt, editedAt: editedAt)
             )

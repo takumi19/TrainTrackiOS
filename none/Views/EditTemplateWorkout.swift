@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct EditTemplateWorkoutView: View {
-    var workout: Workout
+    @State var workout: Workout
     @State var showSearchExercises: Bool = false
     @State var str: String = "1"
     @Environment(\.dismiss) var dismiss
@@ -117,7 +117,7 @@ struct EditTemplateWorkoutView: View {
             .padding()
             .background(.secondaryBg)
             if self.showSearchExercises {
-                ExerciseSearch(isPresented: $showSearchExercises)
+                ExerciseSearch(isPresented: $showSearchExercises, workout: $workout)
             }
         }
         .toolbarVisibility(.hidden)
@@ -188,7 +188,7 @@ struct TemplateExerciseGrid: View {
             // MARK: Set Table
             ForEach(Array(exercise.sets.enumerated()), id: \.offset) { index, set in
                 GridRow {
-                    Text("\(index)")
+                    Text("\(index + 1)")
                         .foregroundStyle(.gray)
 
                     // TODO: Add support for target range
@@ -198,15 +198,10 @@ struct TemplateExerciseGrid: View {
                             .multilineTextAlignment(.center)
                             .frame(maxWidth: 20, maxHeight: 4, alignment: .center)
                             .padding()
-//                            .textFieldStyle(.roundedBorder)
                             .background(
                                 RoundedRectangle(cornerRadius: 10)
                                     .stroke(Color("PrimaryColor"), lineWidth: 2)
                                 )
-//                            .overlay(
-//                                RoundedRectangle(cornerRadius: 10)
-//                                    .stroke(Color("PrimaryColor"), lineWidth: 2)
-//                            )
                         if rangeChosen {
                             Text("-")
                                 .foregroundStyle(.gray)
@@ -251,7 +246,7 @@ struct TemplateExerciseGrid: View {
                 .aspectRatio(contentMode: .fit)
                 .foregroundStyle(Color("PrimaryColor"), Color.black.opacity(0.3))
         }
-        .frame(width: 50, height: 30) // Define frame size
+        .frame(width: 50, height: 30)
     }
 }
 

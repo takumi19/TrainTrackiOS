@@ -3,31 +3,32 @@ import SwiftUI
 // Dummy model so the preview runs
 struct Program: Identifiable {
     let id = UUID()
-    let name: String
-    let coach: String
-    let currentWorkout: CurrentWorkout
+    var name: String
+    var coach: String
+    var description: String
+    var currentWorkout: CurrentWorkout
 }
 
 struct CurrentWorkout: Identifiable {
     let id = UUID()
-    let exercises: [(name: String, setNumber: Int, bestSetInfo: String)]
+    var exercises: [(name: String, setNumber: Int, bestSetInfo: String)]
 }
 
 struct ProgramCarousel: View {
-    let programs: [Program]                // the cards you want to show
-    @State private var page = 0            // currently‑visible page
+    let programs: [Program]
+    @State private var page = 0
 
     var body: some View {
         VStack(spacing: 16) {
             TabView(selection: $page) {
                 ForEach(programs.indices, id: \.self) { idx in
                     StartedProgramCard(program: programs[idx])
-                        .tag(idx)          // tag drives TabView <‑> page binding
+                        .tag(idx)
                         .padding(.horizontal)
                 }
             }
             .tabViewStyle(.page(indexDisplayMode: .never))
-            .frame(height: 330)            // card height
+            .frame(height: 330)
 
             HStack(spacing: 8) {
                 ForEach(programs.indices, id: \.self) { idx in
@@ -37,7 +38,7 @@ struct ProgramCarousel: View {
                 }
             }
         }
-        .animation(.easeInOut, value: page) // smooth colour change
+        .animation(.easeInOut, value: page)
     }
 }
 
@@ -82,9 +83,9 @@ struct StartedProgramCard: View {
                 } label: {
                     Label("", systemImage: "ellipsis")
                         .foregroundStyle(Color("PrimaryColor"))
-                        .font(.system(size: 20, weight: .bold)) // Increase size and weight
-                        .symbolRenderingMode(.monochrome) // Ensure consistent styling
-                        .imageScale(.large) // Optional: Adjust scale if needed
+                        .font(.system(size: 20, weight: .bold))
+                        .symbolRenderingMode(.monochrome)
+                        .imageScale(.large)
                 }
             } // Card Header
             .frame(maxHeight: 70)
@@ -150,6 +151,9 @@ struct StartedProgramCard: View {
 struct ProgramsView: View {
     let currWorkout: CurrentWorkout
     let programs: [Program]
+    @State var showShareScreen: Bool = false
+    @State var shareId: Int = 0
+//    @State var deleteId: Int = 0
 
     init() {
         currWorkout = CurrentWorkout(exercises: [
@@ -158,9 +162,9 @@ struct ProgramsView: View {
             ("Squat Bottom Hold", 1, "50 kg x 30 sec")
         ])
         programs = [
-            Program(name: "5/3/1 Strength", coach: "Jim Wendler", currentWorkout: currWorkout),
-            Program(name: "GZCLP", coach: "Cody Lefever", currentWorkout: currWorkout),
-            Program(name: "PHUL",  coach: "Brandon Campbell", currentWorkout: currWorkout)
+            Program(name: "5/3/1 Strength", coach: "Jim Wendler", description: "Description for 531", currentWorkout: currWorkout),
+            Program(name: "GZCLP", coach: "Cody Lefever", description: "Description for GZCLP", currentWorkout: currWorkout),
+            Program(name: "PHUL",  coach: "Brandon Campbell", description: "Description for GZCLP", currentWorkout: currWorkout)
         ]
     }
 
@@ -168,13 +172,6 @@ struct ProgramsView: View {
         NavigationStack {
             ZStack {
                 ScrollView {
-                    // Header
-//                    Text("Programs")
-//                        .frame(maxWidth: .infinity, alignment: .leading)
-//                        .font(.largeTitle)
-//                        .fontWidth(.condensed)
-//                        .fontWeight(.bold)
-//                    Spacer().frame(height: 36)
                     Text("Continue Program")
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .font(.title2)
@@ -194,37 +191,53 @@ struct ProgramsView: View {
                             .font(.title2)
                             .fontWidth(.condensed)
                             .fontWeight(.bold)
-                        //                        .padding(.bottom)
                         Spacer()
                         // ---
                         NavigationLink(destination: ProgramDescriptionView()) {
                             Image(systemName: "plus")
                                 .foregroundStyle(Color("PrimaryColor"))
-                                .font(.system(size: 20, weight: .bold)) // Increase size and weight
-                                .symbolRenderingMode(.monochrome) // Ensure consistent styling
+                                .font(.system(size: 20, weight: .bold))
+                                .symbolRenderingMode(.monochrome)
                         }
                         // ---
                     }
 
                     ForEach(programs) { program in
                         NavigationLink(destination: ProgramDescriptionView()) {
-                            ProgramCardView(program: program)
+                            ProgramCardView(program: program, showShareScreen: self.$showShareScreen, shareId: $shareId)
                                 .padding(.bottom)
                         }
                         .buttonStyle(.plain)
                     }
 
                 } // ScrollView
-                .padding()
+                .padding(.horizontal)
+
+                if self.showShareScreen {
+                    Color.black.opacity(0.4)
+                        .ignoresSafeArea()
+                        .onTapGesture {
+                            withAnimation { self.showShareScreen = false }
+                        }
+                        .transition(.opacity)
+                        .zIndex(1)
+                    ShareScreen(isPresented: $showShareScreen, programId: 0)
+                        .transition(.popUp)
+                        .zIndex(2)
+                }
             } // ZStack
             .background(Color.primaryBg)
             .navigationTitle(Text("Programs"))
+            .animation(.spring(response: 0.2, dampingFraction: 0.8),
+                       value: showShareScreen)
         }
     }
 }
 
 struct ProgramCardView: View {
     @State var program: Program
+    @Binding var showShareScreen: Bool
+    @Binding var shareId: Int
 
     var body: some View {
         HStack {
@@ -235,11 +248,9 @@ struct ProgramCardView: View {
             VStack(alignment: .leading, spacing: 12) {
                 Text(program.name)
                     .font(.headline)
-                //                Spacer()
                 Text(program.coach)
                     .font(.subheadline)
                     .foregroundStyle(.secondaryAccent)
-                //                Spacer()
                 Text("\(Int.random(in: 1...5)) Weeks")
                     .font(.caption)
                     .foregroundStyle(.secondaryLabel)
@@ -256,6 +267,8 @@ struct ProgramCardView: View {
                     Label("Edit", systemImage: "folder.badge.plus")
                 }
                 Button {
+                    // Trigger ShareScreen to appear
+                    share()
                 } label: {
                     Label("Manage Access", systemImage: "rectangle.stack.badge.person.crop")
                 }
@@ -270,12 +283,16 @@ struct ProgramCardView: View {
                     .symbolRenderingMode(.monochrome)
                     .imageScale(.large)
             }
-//            .menuStyle(.borderlessButton)
         }
         .padding(12)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(.secondaryBg)
         .clipShape(RoundedRectangle(cornerRadius: 10))
+    }
+
+    func share() {
+        self.showShareScreen.toggle()
+        self.shareId = 1
     }
 }
 

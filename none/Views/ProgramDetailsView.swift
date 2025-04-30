@@ -53,7 +53,7 @@ struct ProgramWorkoutCardView: View {
             Spacer().frame(maxHeight: 30)
             ForEach(Array(workout.exercises.enumerated()), id: \.offset) { index, exercise in
                 HStack(alignment: .top) {
-                    Text("\(index)")
+                    Text("\(index + 1)")
                         .foregroundStyle(.secondaryAccent)
                         .fontWeight(.semibold)
                     VStack(alignment: .leading) {
@@ -158,7 +158,15 @@ struct ProgramWeeksView: View {
 func initWeeks() -> [ProgramWeek] {
     var weeks: [ProgramWeek] = []
     for index in 1..<3 {
-        weeks.append(.init(weekNumber: index, description: "none", workouts: [testingWorkout, testingWorkout, testingWorkout, testingWorkout]))
+        var tw = testingWorkout
+        tw.id += 1
+        var tw1 = tw
+        tw.id += 1
+        var tw2 = tw1
+        tw.id += 1
+        var tw3 = tw2
+        tw.id += 1
+        weeks.append(.init(weekNumber: index, description: "none", workouts: [tw, tw1, tw2, tw3]))
     }
     return weeks
 }

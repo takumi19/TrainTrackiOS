@@ -19,11 +19,11 @@ struct WorkoutDetailsView: View {
 
     var body: some View {
         ZStack {
-            Color.black.opacity(0.4)
-                .ignoresSafeArea()
-                .onTapGesture {
-                    isPresented.toggle()
-                }
+//            Color.black.opacity(0.4)
+//                .ignoresSafeArea()
+//                .onTapGesture {
+//                    isPresented.toggle()
+//                }
             VStack(alignment: .leading, spacing: 12) {
                 HStack {
                     Button(action: {

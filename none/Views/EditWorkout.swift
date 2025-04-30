@@ -6,12 +6,32 @@
 //
 import SwiftUI
 
+extension Exercise {
+    mutating func addSet() {
+        if !self.sets.isEmpty {
+            self.sets.append(self.sets.last!)
+            return
+        }
+        var set: SetDetail = SetDetail()
+        if self.resistanceType == .weighted {
+            set.weight = 10
+        }
+        if self.movementType == .Static {
+            set.duration = 30
+        } else {
+            set.reps = 10
+        }
+        self.sets.append(set)
+    }
+}
+
 struct EditWorkoutView: View {
-    @Binding var workout: Workout
+    @State var workout: Workout
     @Binding var isPresented: Bool
+    let onSave: (Workout) -> Void
     @State var showSearchExercises: Bool = false
-    @State var str: String = "1"
-//    @ObservedObject var vm: WorkoutViewModel = WorkoutViewModel(workout: workout)
+    @State var exercises: [Exercise] = []
+    //    @ObservedObject var vm: WorkoutViewModel = WorkoutViewModel(workout: workout)
 
     var body: some View {
         ZStack {
@@ -38,6 +58,8 @@ struct EditWorkoutView: View {
                     Spacer()
                     Button("Save") {
                         print("Hi")
+                        self.onSave(workout)
+                        self.isPresented = false
                     }
                     .padding(8)
                     .background(.black.opacity(0.3))
@@ -80,7 +102,7 @@ struct EditWorkoutView: View {
                 }
                 .padding(.top, 12)
                 ScrollView {
-                    ForEach(workout.exercises) { exercise in
+                    ForEach($workout.exercises) { $exercise in
                         Divider()
                             .padding(.top, 24)
                         HStack {
@@ -96,10 +118,10 @@ struct EditWorkoutView: View {
                             GridRow {
                                 Text("Set")
                                     .gridColumnAlignment(.center)
-                                if workout.templateName != nil {
+//                                if workout.templateName != nil {
                                     Text("Target")
                                         .gridColumnAlignment(.center)
-                                }
+//                                }
                                 if exercise.resistanceType == .weighted {
                                     Text("kg")
                                         .gridColumnAlignment(.center)
@@ -117,7 +139,7 @@ struct EditWorkoutView: View {
                             .font(.subheadline)
                             .foregroundStyle(.gray)
                             Divider()
-                            ForEach(Array(exercise.sets.enumerated()), id: \.offset) { index, set in
+                            ForEach(Array($exercise.sets.enumerated()), id: \.offset) { index, $set in
                                 GridRow {
                                     Text("\(index + 1)")
                                         .foregroundStyle(.gray)
@@ -129,42 +151,59 @@ struct EditWorkoutView: View {
                                             .foregroundStyle(.gray)
                                     }
                                     if exercise.resistanceType == .weighted {
-                                        Text("\(set.weight ?? 0, specifier: "%.0f")")
+//                                        Text("\(set.weight ?? 0, specifier: "%.0f")")
+                                        TextField("", text: Binding(
+                                            get: {
+                                                if let weight = set.weight {
+                                                    return String(weight)
+                                                }
+                                                return ""
+                                            },
+                                            set: { newValue in
+                                                if let weightValue = Double(newValue) {
+                                                    set.weight = weightValue
+                                                }
+                                            }
+                                        ))
+                                        .multilineTextAlignment(.center)
+                                        .frame(maxWidth: 50, maxHeight: 40, alignment: .center)
+//                                        .padding()
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: 10)
+                                                .stroke(Color("PrimaryColor"), lineWidth: 2)
+                                        )
+//                                        TextField("", text: $weight)
+//                                            .multilineTextAlignment(.center)
+//                                            .frame(maxWidth: 20, maxHeight: 4, alignment: .center)
+//                                            .padding()
+//                                            .overlay(
+//                                                RoundedRectangle(cornerRadius: 10)
+//                                                    .stroke(Color("PrimaryColor"), lineWidth: 2)
+//                                            )
                                     }
                                     if exercise.movementType == .Dynamic {
-//                                        TextField("", text: Binding(
-//                                            get: {
-//                                                // Convert Int? to String, use "" if nil
-//                                                if let reps = set.reps {
-//                                                    return String(reps)
-//                                                } else {
-//                                                    return ""
-//                                                }
-//                                            },
-//                                            set: { newValue in
-//                                                // Convert String back to Int?, set to nil if empty or invalid
-//                                                if let intValue = Int(newValue) {
-//                                                    set.reps = intValue
-//                                                } else {
-//                                                    set.reps = nil // Handle empty or invalid input as nil
-//                                                }
-//                                            }
-//                                        ))
-//                                        .multilineTextAlignment(.center)
-//                                        .frame(maxWidth: 20, maxHeight: 4, alignment: .center)
-//                                        .padding()
-//                                        .overlay(
-//                                            RoundedRectangle(cornerRadius: 10)
-//                                                .stroke(Color("PrimaryColor"), lineWidth: 2)
-//                                        )
-                                        TextField("", text: $str)
-                                            .multilineTextAlignment(.center)
-                                            .frame(maxWidth: 20, maxHeight: 4, alignment: .center)
-                                            .padding()
-                                            .overlay(
-                                                RoundedRectangle(cornerRadius: 10)
-                                                    .stroke(Color("PrimaryColor"), lineWidth: 2)
-                                            )
+                                        TextField("", text: Binding( // $str
+                                            get: {
+                                                if let reps = set.reps {
+                                                    return String(reps)
+                                                }
+                                                return ""
+                                            },
+                                            set: { newValue in
+                                                if let reps = Int(newValue) {
+                                                    set.reps = reps
+                                                } else {
+                                                    print("\(newValue) could not be converted to int")
+                                                }
+                                            }
+                                        ))
+                                        .multilineTextAlignment(.center)
+                                        .frame(maxWidth: 20, maxHeight: 4, alignment: .center)
+                                        .padding()
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: 10)
+                                                .stroke(Color("PrimaryColor"), lineWidth: 2)
+                                        )
                                     } else if exercise.movementType == .Static {
                                         Text("\(set.duration!)")
                                             .gridColumnAlignment(.center)
@@ -175,13 +214,31 @@ struct EditWorkoutView: View {
                                                     .stroke(Color("PrimaryColor"), lineWidth: 2)
                                             )
                                     }
-                                    Text("\(set.rpe ?? 0)")
+//                                    Text("\(set.rpe ?? 0)")
+                                    TextField("6", text: Binding( // $rpe
+                                        get: { String(set.rpe ?? 0) },
+                                        set: { newValue in
+                                            if let rpe = Int(newValue) {
+                                                set.rpe = rpe
+                                            } else {
+                                                print("\(newValue) could not be converted to int")
+                                            }
+                                        }
+                                    ))
+                                    .multilineTextAlignment(.center)
+                                    .frame(maxWidth: 20, maxHeight: 4, alignment: .center)
+                                    .padding()
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 10)
+                                            .stroke(Color("PrimaryColor"), lineWidth: 2)
+                                    )
                                 }
                             }
                         }
                         .padding(.bottom)
                         Button {
                             print("Add something")
+                            exercise.addSet()
                         } label: {
                             Label("Add Set", systemImage: "plus")
                         }
@@ -223,12 +280,13 @@ struct EditWorkoutView: View {
                 }
                 .scrollIndicators(.hidden)
             }
-            .padding()
+            .padding(.horizontal)
             .background(.secondaryBg)
             if self.showSearchExercises {
-                ExerciseSearch(isPresented: $showSearchExercises)
+                ExerciseSearch(isPresented: $showSearchExercises, workout: $workout)
             }
         }
+        .toolbar(.hidden, for: .tabBar)
     }
 
     private var moreButton: some View {
@@ -242,20 +300,10 @@ struct EditWorkoutView: View {
                 .aspectRatio(contentMode: .fit)
                 .foregroundStyle(Color("PrimaryColor"), Color.black.opacity(0.3))
         }
-        .frame(width: 50, height: 30) // Define frame size
+        .frame(width: 40, height: 30)
     }
 }
 
 #Preview {
-    // Wrapper view to provide the binding
-    struct PreviewWrapper: View {
-        @State var isPresented: Bool = true
-        @State var workout = testingWorkout
-
-        var body: some View {
-            EditWorkoutView(workout: $workout, isPresented: $isPresented)
-        }
-    }
-
-    return PreviewWrapper()
+    EditWorkoutView(workout: testingWorkout, isPresented: .constant(true), onSave: { _ in })
 }

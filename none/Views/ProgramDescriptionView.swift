@@ -35,9 +35,11 @@ struct NavBarView: View {
 struct ProgramDescriptionView: View {
     @Environment(\.dismiss) var dismiss
 
-    @State private var programName: String = ""
-    @State private var programDescription: String = ""
+    @State private var programName: String = "GZCLP"
+    @State private var programDescription: String = "Strength program"
     @State private var selectedWeekCount: Int = 1
+
+//    @State var program: ProgramTemplate
 
     var body: some View {
         VStack(spacing: 0) {
@@ -133,8 +135,18 @@ struct ProgramDescriptionView: View {
 #Preview {
 //    EditProgramView()
     //    ProgramDetailsView()
+//    var currWorkout = CurrentWorkout(exercises: [
+//        ("Bench Press (Barbell)", 3, "100 kg x 1"),
+//        ("Pull Ups (Bodyweight)", 5, "22"),
+//        ("Squat Bottom Hold", 1, "50 kg x 30 sec")
+//    ])
+//    var programs = [
+//        Program(name: "5/3/1 Strength", coach: "Jim Wendler", description: "Description for 531", currentWorkout: currWorkout),
+//        Program(name: "GZCLP", coach: "Cody Lefever", description: "Description for GZCLP", currentWorkout: currWorkout),
+//        Program(name: "PHUL",  coach: "Brandon Campbell", description: "Description for GZCLP", currentWorkout: currWorkout)
+//    ]
     NavigationStack {
-        ForEach(0..<3) { index in
+        ForEach(programTemplates.indices, id: \.self) { index in
             NavigationLink(destination: ProgramDescriptionView()) {
                 Text("Link number \(index)")
             }
